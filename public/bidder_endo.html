@@ -1,0 +1,76 @@
+<!doctype html>
+<title>Step 1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Loading script and stylsheets needed -->
+<link rel="stylesheet" href="css/jqueryui.min.css" />
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+<link rel="stylesheet" href="css/bidder.css" />
+<!-- end -->
+<body>
+  <div class="container pushed-down">
+    
+    <div id="current-round-info" class="col-md-12">
+      
+      <div class="col-md-12 mini-pushed-down">
+        <h3>Current Round</h3>       
+        <br/>
+        <table id="bid_table">
+          <tr>
+            <td class="left">
+              <p>You have received:</p>
+            </td>
+            <td>
+              &nbsp;&nbsp;&nbsp;&nbsp;<strong>20</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; coins.
+            </td>
+          </tr>
+          <tr>
+            <td class="left">
+              <p>You decide to put in the group account:</p>
+            </td>
+            <td>
+              <input type="number" min="0" max="20" id="contribution" class="inline" size="3" /> coins.
+            </td>
+          </tr>
+          <tr id="demandBox">
+            <td class="left">
+              <p>You agree to form a group with players that contributed no less than: </p>
+            </td>
+            <td>
+              <input type="number" min="0" max="20" id="demand" class="inline" size="3" /> coins.
+            </td>
+          </tr>
+        </table>
+      </div>
+      
+      <br />
+      <div id="divErrors" class="col-md-12"></div>
+      
+      <br />
+      
+      <div id="previous-round-info" class="col-md-12" style="display: none; clear: both; border-top: 1px solid #CCC">
+        <h3>Reminder: in the previous round</h3>
+        <p>You decided to put <strong><span id="yourPB"></span></strong> coins into your personal box.</p>
+        <p>
+          You decided to put <strong><span id="yourOldContrib"></span></strong> coins into the group account and the return was <strong><span id="yourReturn"></span></strong>.
+        </p>
+        <p id="summaryPreviousDemand">
+          You agreed to form a group with players that contributed no less than <strong><span id="yourOldDemand"></span></strong>.
+        <p> Your final payoff was <strong><span id="yourPayoff"></span></strong>.</p>
+        
+      </div> 
+      
+      <div id="timeupReminder">
+        <p style="clear: both; text-align: center; border-top: 1px solid #CCC"><br/>
+          <strong>Attention: </strong> if you do not make a choice before the time expires, your previous decision will be used. On the first round, a random decision will be made for you.
+        </p>
+      </div>
+      
+      
+    </div>
+   
+  </div>
+  
+  <script type="text/javascript" src="../js/jquery.js"></script>
+  <script type="text/javascript" src="../js/jqueryui.min.js"></script>
+  <script type="text/javascript" src="../js/merit.bars.js"></script>
+</body>

@@ -1,0 +1,29 @@
+{
+    "name": "meritocracy-game",
+    "channelName": "meritocracy",
+    "description": "Public-good game with income mobility.",
+    "version": "1.2.0",
+    "card": {
+        "description": "Public good game with income mobility.",
+        "icon": "gavel"
+    },
+    "author": {
+        "name": "Thi Anh Dam, Federico Innocenti, Can Celebi",
+        "email": "info@nodegame.org",
+        "url": "http://www.nodegame.org"
+    },
+    "main": "./index.html",
+    "keywords": [
+        "mobility",
+        "game theory",
+        "nodegame",
+        "public good",
+        "game",
+        "behavioral"
+    ],
+    "license": "MIT/X11",
+    "engines": {
+        "node": "*",
+        "nodegame": ">= 4.0.0"
+    }
+}
