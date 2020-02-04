@@ -24,13 +24,11 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             node = this.node;
 
             // We do not actually play.
-
             if (id === 'bid') {
                 node.on('PLAYING', function() {
                     node.timer.randomExec(function() {
                         node.done({
-                            contribution: J.randomInt(-1, 20),
-                            demamd: J.randomInt(-1, 20)
+                            contribution: J.randomInt(-1, 20)
                         });
                     });
                 });

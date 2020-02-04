@@ -18,20 +18,20 @@ module.exports = function(stager, settings) {
         .step('effort')
         .step('bid')
         .step('results')
-    
+
         .next('questionnaire')
-    
+
         .next('end')
 
         .gameover();
 
-    
+
 
 
     // Modify the stager to skip some stages.
 
-    // stager.skip('instructions');
-  //  stager.skip('quiz');
+    stager.skip('instructions');
+    stager.skip('quiz');
  //   stager.skip('effort');
     // stager.skip('game');
     // stager.skip('questionnaire');

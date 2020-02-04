@@ -11,7 +11,6 @@ var path = require('path');
 var fs   = require('fs-extra');
 
 var ngc = require('nodegame-client');
-var GameStage = ngc.GameStage;
 var J = ngc.JSUS;
 
 
@@ -19,23 +18,13 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
     var channel = gameRoom.channel;
     var node = gameRoom.node;
-
-    var treatments;
-
-
-    // Require treatments file.
-    treatments = channel.require(__dirname + '/includes/treatments.js', {
-        node: node,
-        settings: settings
-    }, true);
-
     var groupSize = gameRoom.game.waitroom.GROUP_SIZE;
 
     stager.setDefaultProperty('minPlayers', [ groupSize ]);
 
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
-        console.log('********************** meritocracy ' + gameRoom.name);
+        console.log('********************** socmob ' + gameRoom.name);
 
         // Keep tracks of results sent to players in case of disconnections.
         node.game.savedResults = {};
@@ -60,38 +49,38 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                     id: msg.from,
                     effort: msg.data.effort
                 });
-                //debugger
             });
         }
     });
 
     //THIS IS BID IN MERIT-BASED TREATMENT (Treatment 1)
     stager.extendStep('bid', {
+        init: function() {
+            // Counter for total contributions in this round.
+            this.totalContr = 0;
+        },
         cb: function() {
             // Sort them
             var sorted = node.game.efforts.sort(function(a, b) {
                 return b.effort - a.effort;
             });
             // to get from game.settings
-
             var m = node.game.settings.N_HIGH;
             var H = node.game.settings.HIGH;
             var L = node.game.settings.LOW;
 
-            var Income = [];
-            var PId = "";
-            for (var i = 0; i < groupSize; i++) {
-                if (i<m) {
-                    Income.push(H);
-                }
-                else {
-                    Income.push(L);
-                }
-                var income = Income[i];
-                node.say('income', sorted[i].id, income);
-                PId = sorted[i].id;
-                this.incomes[PId] = income;
+            var pid, income;
+            for (var i = 0; i < sorted.length; i++) {
+                if (i < m) income = H;
+                else income = L;
+                pid = sorted[i].id;
+                node.say('income', pid, income);
+                this.incomes[pid] = income;
             }
+
+            node.on.data('done', function(msg) {
+                this.totalContr += msg.data.contribution;
+            });
         }
     });
 
@@ -100,9 +89,22 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             this.savedResults = {};
         },
         cb: function() {
-            // Computes the values for all players and all groups,
-            // sends them to the clients, and save results into database.
-            treatments[treatmentName].sendResults();
+            var previousStep, sortedContribs, total;
+
+            // Get previous contributions
+            previousStep = node.game.getPreviousStep();
+            // Get all contribution in previous step.
+            sortedContribs = node.game.memory.stage[previousStep]
+            .selexec('contribution')
+            // Sorting not needed now.
+            // .sort(sortContributions)
+            .fetch();
+
+            // Multiply contributions.
+            total = this.totalContr * settings.GROUP_ACCOUNT_MULTIPLIER;
+
+            // Save to db, and sends results to players.
+            finalizeRound(total, this.incomes, sortedContribs);
         }
     });
 
@@ -116,12 +118,47 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 say: true,   // default false
                 dump: true,  // default false
                 print: true  // default false
-
             });
 
             // Dump all memory.
             node.game.memory.save('memory_all.json');
         }
     });
+
+    // Helper functions.
+
+    // Saves results and sends to clients.
+    function finalizeRound(total, incomes, sortedContribs) {
+        var i, contribObj;
+        var pid, payoff, client, distribution;
+
+        distribution = total / sortedContribs.length;
+        // Save the results for each player, and notify him/her.
+        for ( i=0 ; i < sortedContribs.length; i++) {
+            contribObj = sortedContribs[i];
+            pid = contribObj.player;
+
+            payoff = distribution + incomes[pid] - contribObj.contribution;
+
+            // Store payoff in registry, so that gameRoom.computeBonus
+            // can access it.
+            client = channel.registry.getClient(pid);
+            client.win += payoff;
+
+            node.say('results', pid, {
+                distribution: distribution,
+                total: total,
+                payoff: payoff
+            });
+        }
+    }
+
+    // If two contributions are exactly the same, then they are randomly ordered.
+    function sortContributions(c1, c2) {
+        if (c1.contribution > c2.contribution) return -1;
+        if (c1.contribution < c2.contribution) return 1;
+        if (Math.random() <= 0.5) return -1;
+        return 1;
+    }
 
 };

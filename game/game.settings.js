@@ -27,7 +27,8 @@ module.exports = {
 
     // Payment settings. *
     //MPCR
-    GROUP_ACCOUNT_DIVIDER: 2,
+    GROUP_ACCOUNT_MULTIPLIER: 2,
+
     //high income
     HIGH:40,
     //low income

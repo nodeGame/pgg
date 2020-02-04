@@ -28,125 +28,19 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         this.visualTimer = node.widgets.append('VisualTimer', header);
         this.doneButton = node.widgets.append('DoneButton', header);
 
-        // Takes in input the results of _checkInputs_ and correct eventual
-        // mistakes. If in the first round a random value is chosen, otherwise
-        // the previous decision is repeated. It also updates the screen.
-        this.correctInputs = function(checkResults) {
-            var contrib, demand;
-            var errorC, errorD;
-
-            if (checkResults.success) {
-                contrib = parseInt(W.getElementById('contribution').value, 10);
-            }
-            else {
-
-                if (checkResults.errContrib) {
-
-                    if ('number' !== typeof node.game.oldContrib) {
-                        contrib = JSUS.randomInt(-1, 20);
-                    }
-                    else {
-                        contrib = node.game.oldContrib;
-                    }
-                    errorC = document.createElement('p');
-                    errorC.innerHTML = 'Your contribution was set to ' +contrib;
-                    W.getElementById('divErrors').appendChild(errorC);
-                    W.getElementById('contribution').value = contrib;
-                }
-            }
-
-            return {
-                contribution: contrib
-            };
-        };
-
-        // Retrieves and checks the current input for contribution, and for
-        // demand (if requested). Returns an object with the results of the
-        // validation. It also displays a message in case errors are found.
-        this.checkInputs = function() {
-            var contrib;
-            var divErrors, errorC;
-
-            divErrors = W.getElementById('divErrors');
-
-            // Clear previous errors.
-            divErrors.innerHTML = '';
-
-            // Always check the contribution.
-            contrib = W.getElementById('contribution').value;
-
-            if (!node.game.isValidContribution(contrib)) {
-                errorC = document.createElement('p');
-                errorC.innerHTML = 'Invalid contribution. ' +
-                'Please enter a number between 0 and ' + node.game.income;
-                divErrors.appendChild(errorC);
-            }
-
-            return {
-                success: !errorC,
-                errContrib: !!errorC
-            };
-        };
-
-        this.updateResults = function (barsValues) {
-            var group, player, i, j, div, subdiv, color, save;
-            var barsDiv, showDemand;
-            var text, groupHeader, groupHeaderText, groupNames;
-            var payoffSpan, bars;
-
-            groupNames = node.game.settings.GROUP_NAMES;
-
-            console.log(barsValues);
-
-            barsDiv = W.getElementById('barsResults');
-            payoffSpan = W.getElementById('payoff');
-
-            barsDiv.innerHTML = '';
-
-            bars = W.getFrameWindow().bars;
-
-            for (i = 0; i < barsValues[0].length; i++) {
-                group = barsValues[0][i];
-                div = document.createElement('div');
-                div.classList.add('groupContainer');
-                groupHeader = document.createElement('h4');
-                groupHeaderText = 'Group ' + groupNames[i];
-                if (showDemand) {
-                    groupHeaderText += barsValues[3][i] ? ' (' : ' (not ';
-                    groupHeaderText += 'compatible)';
-                }
-
-            }
-
-            node.game.oldPayoff = +barsValues[2]; // final payoff
-
-            // How many coins player put in personal account.
-            save = node.game.income - node.game.oldContrib;
-            payoffSpan.innerHTML = save + ' + ' + (barsValues[2] - save) +
-            ' = ' + node.game.oldPayoff;
-        };
-
-        this.displaySummaryPrevRound = function () {
+        this.displaySummaryPrevRound = function() {
             var save, groupReturn;
-
             // Shows previous round if round number is not 1.
-            if ('number' === typeof node.game.oldContrib) {
+            if ('number' !== typeof node.game.oldContrib) return;
+            save = node.game.income - node.game.oldContrib;
+            groupReturn = node.game.oldPayoff - save;
 
-                save = node.game.income - node.game.oldContrib;
-                groupReturn = node.game.oldPayoff -save;
-
-                W.getElementById('previous-round-info').style.display = 'block';
-
-                // Updates display for current round.
-                W.setInnerHTML('yourPB', save);
-                W.setInnerHTML('yourOldContrib', node.game.oldContrib);
-                W.setInnerHTML('yourReturn', groupReturn);
-                W.setInnerHTML('yourPayoff', node.game.oldPayoff);
-
-                if (node.game.isEndo()) {
-                    W.setInnerHTML('yourOldDemand', node.game.oldDemand);
-                }
-            }
+            W.show('previous-round-info');
+            // Updates display for current round.
+            W.setInnerHTML('yourPB', save);
+            W.setInnerHTML('yourOldContrib', node.game.oldContrib);
+            W.setInnerHTML('yourReturn', groupReturn);
+            W.setInnerHTML('yourPayoff', node.game.oldPayoff);
         };
     });
 
@@ -206,13 +100,10 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     stager.extendStep('effort', {
         frame: 'EffortTask.html',
         done: function() {
-            var effortresult = 'Correct answers: ' + node.game.correct;
-            //            alert(effortresult);
-            var effort = { effort: node.game.correct };
-            return effort;
+            return { effort: node.game.correct };
         },
         cb: function() {
-            var above = W.getElementById ('above');
+            var above = W.gid('above');
             // variable to count correct answer
             var correct = 0;
             node.game.correct = correct;
@@ -288,34 +179,35 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     stager.extendStep('bid', {
         frame: settings.bidderPage,
         cb: function() {
-            ////////////////////////////////
+
             // Show summary previous round.
             node.game.displaySummaryPrevRound();
 
-            // Clear previous errors.
-            W.setInnerHTML('divErrors', '');
+            node.game.bidInput = node.widgets.append('CustomInput', "input-td", {
+                type: 'int',
+                min: 0,
+                max: 20
+            });
 
-            // Clear contribution and demand inputs.
-            W.getElementById('contribution').value = '';
-
-            console.log('Meritocracy: bid page.');
             node.on.data('income', function(msg) {
                 W.setInnerHTML('bid_income', msg.data);
                 node.game.income = msg.data;
             });
         },
+        timeup: function() {
+            node.game.bidInput.setValues({
+                // Random value if undefined.
+                values: node.game.oldContrib
+            });
+            node.done();
+        },
         done: function() {
-            var validation, bid;
-            validation = node.game.checkInputs();
-            // Do not go forward if it is not timeup and validation failed.
-            if (!node.game.timer.isTimeup() && !validation.success) {
-                return false;
-            }
-            bid = node.game.correctInputs(validation);
+            var bid = node.game.bidInput.getValues();
+            if (!bid.isCorrect && !node.game.timer.isTimeup()) return;
             // Store reference for next round.
-            node.game.oldContrib = bid.contribution;
+            node.game.oldContrib = bid.value;
             // Send it to server.
-            return bid;
+            return { contribution: bid.value };
         }
     });
 
@@ -323,26 +215,25 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         frame: settings.resultsPage,
         cb: function () {
             node.on.data('results', function(msg) {
-                var treatment, barsValues;
+                var payoff = msg.data.payoff;
 
-                console.log('Received results.');
+                node.game.oldPayoff = payoff;
 
-                barsValues = msg.data;
-
-
-                this.updateResults(barsValues);
+                // How many coins player put in personal account.
+                var save = node.game.income - node.game.oldContrib;
+                var payoffSpan = W.gid('payoff');
+                payoffSpan.innerHTML = save + ' + ' + (payoff - save) +
+                ' = ' + node.game.oldPayoff;
             });
         }
     });
 
-
-
     stager.extendStep('questionnaire', {
-        frame: 'postgame.htm',
         widget: {
             name: 'ChoiceManager',
-            root: 'root',
+            root: 'container',
             options: {
+                className: 'centered',
                 id: 'questionnaire',
                 title: false,
                 forms:  [
@@ -413,10 +304,10 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
     stager.extendStep('end', {
         donebutton: false,
-        frame: 'ended.html',
         widget: {
             name: 'EndScreen',
             root: 'root',
+            className: 'centered',
             options: {
                 panel: false,
                 title: false,
