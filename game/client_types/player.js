@@ -9,13 +9,6 @@
  */
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
-    
-    // Variable here are available to all stages.
-    stager.setDefaultGlobals({
-        // Total number of players in group.
-        totPlayers: gameRoom.game.waitroom.GROUP_SIZE,
-
-    });
 
     stager.setOnInit(function() {
         var header, frame;
@@ -26,7 +19,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         COINS = node.game.settings.INITIAL_COINS;// we do not need this information in our game
 
         node.game.oldContrib = null;
-        node.game.oldDemand = null;
         node.game.oldPayoff = null;
         node.game.income= null;
 
@@ -40,16 +32,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         });
         this.visualTimer = node.widgets.append('VisualTimer', header);
         this.doneButton = node.widgets.append('DoneButton', header);
-
-        // Check if treatment is Endo.
-        this.isEndo = function () {
-            return node.game.settings.treatmentName === "endo";
-        };
-
-        // Valid Bid and Demand.
-        this.isValidDemand = this.isValidContribution = function(n) {
-            return false !== JSUS.isInt(n, 0, node.game.income);
-        };
 
         // Takes in input the results of _checkInputs_ and correct eventual
         // mistakes. If in the first round a random value is chosen, otherwise
@@ -80,21 +62,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                     W.getElementById('divErrors').appendChild(errorC);
                     W.getElementById('contribution').value = contrib;
                 }
-
-                // In ENDO we check the demand too.
-                if (checkResults.errDemand) {
-
-                    if ('number' !== typeof node.game.oldDemand) {
-                        demand = JSUS.randomInt(-1, 20);
-                    }
-                    else {
-                        demand = node.game.oldDemand;
-                    }
-                    errorD = document.createElement('p');
-                    errorD.innerHTML = 'Your demand was set to ' + demand;
-                    W.getElementById('divErrors').appendChild(errorD);
-                    W.getElementById('demand').value = demand;
-                }
             }
 
             return {
@@ -123,19 +90,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 errorC.innerHTML = 'Invalid contribution. ' +
                     'Please enter a number between 0 and ' + node.game.income;
                 divErrors.appendChild(errorC);
-            }
-
-            // In ENDO we check the demand too.
-            if (node.game.isEndo()) {
-
-                demand = W.getElementById('demand').value;
-
-                if (!node.game.isValidDemand(demand)) {
-                    errorD = document.createElement('p');
-                    errorD.innerHTML = 'Invalid demand. ' +
-                        'Please enter a number between 0 and ' + node.game.income;
-                    divErrors.appendChild(errorD);
-                }
             }
 
             return {
@@ -229,7 +183,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         cb: function() {
             var n, s;
             s = node.game.settings;
-            n = node.game.globals.totPlayers;
+            n=4;
             W.setInnerHTML('players-count', n);
             W.setInnerHTML('players-count-minus-1', (n-1));
             W.setInnerHTML('rounds-count', s.REPEAT);
@@ -440,11 +394,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 console.log('Received results.');
 
                 barsValues = msg.data;
-                treatment = node.env('roomType');
 
-                if (treatment === 'endo') {
-                    W.setInnerHTML('yourOldDemand', node.game.oldDemand);
-                }
 
                 this.updateResults(barsValues);
             });
