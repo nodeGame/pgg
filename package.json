@@ -1,6 +1,6 @@
 {
-    "name": "meritocracy-game",
-    "channelName": "meritocracy",
+    "name": "socialmobility-game",
+    "channelName": "socmob",
     "description": "Public-good game with income mobility.",
     "version": "1.2.0",
     "card": {

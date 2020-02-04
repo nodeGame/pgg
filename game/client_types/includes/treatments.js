@@ -47,34 +47,6 @@ function sortContributions(c1, c2) {
     return 1;
 }
 
-// If two demands are exactly the same, then they are randomly ordered.
-function sortDemands(c1, c2) {
-    if (c1.demand > c2.demand) return -1;
-    if (c1.demand < c2.demand) return 1;
-    if (Math.random() <= 0.5) return -1;
-    return 1;
-}
-
-// If two contributions are exactly the same, then they are randomly ordered.
-function sortNoisyContributions(c1, c2) {
-    if (c1.noisyContribution > c2.noisyContribution) return -1;
-    if (c1.noisyContribution < c2.noisyContribution) return 1;
-    if (Math.random() <= 0.5) return -1;
-    return 1;
-}
-
-/**
- * Returns payoff
- *
- * @param  {array} contributions Array of contribution values by group
- * @param  {array} position     position of current player
- * @param  {object} currentStage current stage
- * @return {int}              payoff
- */
-
-
-
-
 function getPayoff(bars, position, pid) {
     var payoff, group;
     group = bars[position[0]];

@@ -23,14 +23,7 @@ module.exports = {
 
     // Minimum number of players that must be always connected.
     MIN_PLAYERS: 4,
-    GROUP_NAMES: ['1'],
 
-    // How many player in each group. *
-    SUBGROUP_SIZE: 4,
-    // 2 subjects have high income
-    N_HIGH: 2,
-    // 2 subjects have low income
-    N_LOW: 2,
 
     // Payment settings. *
     //MPCR
@@ -42,14 +35,6 @@ module.exports = {
 
     // Divider ECU / DOLLARS *
     EXCHANGE_RATE: 0.01,
-
-    // WE DON'T USE THIS INFORMATION IN OUR TREATMENT
-/////////////////////////
-// Noise standard deviation. High and low "meritocracy".
-    NOISE_HIGH: 1.4142,
-    NOISE_LOW: 2,
-    INITIAL_COINS: 20,
-/////////////////////////
 
 // setup time for each stage
     TIMER: {
