@@ -27,7 +27,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         console.log('********************** socmob ' + gameRoom.name);
 
         // Keep tracks of results sent to players in case of disconnections.
-        node.game.savedResults = {};
         node.game.incomes = {};
 
         // Add session name to data in DB.
@@ -78,6 +77,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 this.incomes[pid] = income;
             }
 
+            // Keep count of total contributions as they arrive.
             node.on.data('done', function(msg) {
                 this.totalContr += msg.data.contribution;
             });
@@ -85,9 +85,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('results', {
-        init: function() {
-            this.savedResults = {};
-        },
         cb: function() {
             var previousStep, sortedContribs, total;
 
