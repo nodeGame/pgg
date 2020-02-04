@@ -140,7 +140,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                             zeros += 1;
                         }
                     }
-                };
+                }
 
                 node.game.zero = node.widgets.append('CustomInput', 'above', {
                     id: 'zero',
@@ -156,20 +156,20 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             genrand(n,m);
 
             var button;
-            button = W.getElementById('submitAnswer');
+            button = W.gid('submitAnswer');
 
 
             button.onclick = function() {
                 var count = node.game.zero.getValues().value;
-                if (count === zeros){
-                    var message = 'Correct';
+                var message;
+                if (count === zeros) {
+                    message = 'Correct';
                     node.game.correct += 1;
-                    alert(message);
                 }
-                else{
-                    var message = 'Wrong';
-                    alert(message);
+                else {
+                    message = 'Wrong';
                 }
+                alert(message);
                 genrand(n,m);
             };
         },
@@ -179,14 +179,15 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     stager.extendStep('bid', {
         frame: settings.bidderPage,
         cb: function() {
-
+            debugger
             // Show summary previous round.
             node.game.displaySummaryPrevRound();
 
             node.game.bidInput = node.widgets.append('CustomInput', "input-td", {
                 type: 'int',
                 min: 0,
-                max: 20
+                max: 20,
+                requiredChoice: true
             });
 
             node.on.data('income', function(msg) {
@@ -195,15 +196,19 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             });
         },
         timeup: function() {
+            var contribution = node.game.oldContrib;
+            if ('undefined' === typeof contribution) {
+                contribution = J.randomInt(-1, 20);
+            }
             node.game.bidInput.setValues({
                 // Random value if undefined.
-                values: node.game.oldContrib
+                values: contribution
             });
             node.done();
         },
         done: function() {
             var bid = node.game.bidInput.getValues();
-            if (!bid.isCorrect && !node.game.timer.isTimeup()) return;
+            if (!bid.isCorrect && !node.game.timer.isTimeup()) return false;
             // Store reference for next round.
             node.game.oldContrib = bid.value;
             // Send it to server.
@@ -306,10 +311,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         donebutton: false,
         widget: {
             name: 'EndScreen',
-            root: 'root',
-            className: 'centered',
+            root: 'container',
             options: {
-                panel: false,
+                className: 'centered',
                 title: false,
                 feedback: false,
                 exitCode: false,
