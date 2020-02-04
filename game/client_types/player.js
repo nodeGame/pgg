@@ -15,13 +15,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
         console.log('INIT PLAYER!');
 
-        // Variable here are available to all stages.
-        stager.setDefaultGlobals({
-            // Total number of players in group.
-            totPlayers: gameRoom.game.waitroom.GROUP_SIZE,
-        });
-
-
         node.game.oldContrib = null;
         node.game.oldPayoff = null;
         node.game.income= null;
@@ -160,17 +153,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     // STAGES and STEPS.
 
     stager.extendStep('instructions', {
-        frame: settings.instrPage,
-        cb: function() {
-            var n, s;
-            // Replacing some text in the instruction page.
-            s = node.game.settings;
-            n = node.game.globals.totPlayers;
-            W.setInnerHTML('players-count', n);
-            W.setInnerHTML('players-count-minus-1', (n-1));
-            W.setInnerHTML('rounds-count', s.REPEAT);
-            console.log('Instructions');
-        }
+        frame: settings.instrPage
     });
 
     stager.extendStep('quiz', {
@@ -180,6 +163,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             options: {
                 id: 'quiz',
                 title: false,
+                className: 'centered',
                 forms: [
                     {
                         name: 'ChoiceTable',

@@ -29,9 +29,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         settings: settings
     }, true);
 
-    stager.setDefaultProperty('minPlayers', [
-        gameRoom.game.waitroom.GROUP_SIZE
-    ]);
+    var groupSize = gameRoom.game.waitroom.GROUP_SIZE;
+
+    stager.setDefaultProperty('minPlayers', [ groupSize ]);
 
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
@@ -45,8 +45,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         node.game.memory.on('insert', function(o) {
             o.session = node.nodename;
         });
-
-
     });
 
     // Extends Stages and Steps where needed.
@@ -67,7 +65,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         }
     });
 
-
     //THIS IS BID IN MERIT-BASED TREATMENT (Treatment 1)
     stager.extendStep('bid', {
         cb: function() {
@@ -76,14 +73,14 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 return b.effort - a.effort;
             });
             // to get from game.settings
-            var n = node.game.settings.SUBGROUP_SIZE;
+
             var m = node.game.settings.N_HIGH;
             var H = node.game.settings.HIGH;
             var L = node.game.settings.LOW;
 
             var Income = [];
             var PId = "";
-            for (var i = 0; i < n; i++) {
+            for (var i = 0; i < groupSize; i++) {
                 if (i<m) {
                     Income.push(H);
                 }
@@ -94,15 +91,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 node.say('income', sorted[i].id, income);
                 PId = sorted[i].id;
                 this.incomes[PId] = income;
-
-                debugger
             }
-
-
         }
     });
-
-
 
     stager.extendStep('results', {
         init: function() {

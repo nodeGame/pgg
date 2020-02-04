@@ -33,6 +33,9 @@ module.exports = {
     //low income
     LOW: 20,
 
+    //how many high income
+    N_HIGH: 1,
+
     // Divider ECU / DOLLARS *
     EXCHANGE_RATE: 0.01,
 

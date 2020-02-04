@@ -26,14 +26,6 @@ module.exports = treatments;
 
 var GROUP_ACCOUNT_DIVIDER = settings.GROUP_ACCOUNT_DIVIDER;
 
-// Number of coins for each player at the beginning of each round
-var INITIAL_COINS = settings.INITIAL_COINS; //var INITIAL_COINS = settings.INITIAL_COINS;
-
-// Functions used in map-reduce.
-
-function averageContribution(pv, cv) {
-    return pv + cv.contribution;
-}
 
 function computeGroupAccount(prev, curr) {
     return prev + curr[0];
@@ -131,24 +123,6 @@ function computeGroupStats(groups) {
 
     }
     return out;
-}
-
-/**
- * Create Noise on contribution.
- * @param  {NDDB} receivedData Received data from client
- * @return {NDDB}              Received data, with noise field
- */
-function createNoise(receivedData, variance) {
-    var contrib;
-    var i, len;
-    i = -1, len = receivedData.db.length;
-    for (; ++i < len;) {
-        contrib = receivedData.db[i].contribution;
-        receivedData.db[i].noisyContribution = contrib +
-            J.nextNormal(0, variance);
-        // console.log(contrib, receivedData.db[i].noisyContribution);
-    }
-    return receivedData;
 }
 
 /**
