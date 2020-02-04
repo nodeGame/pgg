@@ -179,7 +179,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     stager.extendStep('bid', {
         frame: settings.bidderPage,
         cb: function() {
-            debugger
+
             // Show summary previous round.
             node.game.displaySummaryPrevRound();
 

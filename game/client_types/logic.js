@@ -117,6 +117,8 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 print: true  // default false
             });
 
+            // TODO: save email
+
             // Dump all memory.
             node.game.memory.save('memory_all.json');
         }
