@@ -10,6 +10,7 @@
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
+
     stager.setOnInit(function() {
         var header, frame;
 
@@ -44,6 +45,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         };
     });
 
+
     // STAGES and STEPS.
 
     stager.extendStep('instructions', {
@@ -51,6 +53,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('quiz', {
+        frame: 'quiz_exo_perfect.html',
         widget: {
             name: 'ChoiceManager',
             root: 'root',
@@ -65,8 +68,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                         choices: ['20', '40', '20 or 40', 'Other/not clear from instructions'],
                         correctChoice: 2,
                         shuffleChoices: true,
-                        //                    requiredChoice: true,
-                        //                    title: false,
                         mainText: 'How many coins do you get every of the 4 rounds?',
                         //
                     },
@@ -76,8 +77,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                         choices: ['30', '10', '20', 'Other/not clear from instructions'],
                         correctChoice: 2,
                         shuffleChoices: true,
-                        //                    requiredChoice: true,
-                        //                    title: false,
                         mainText: 'If you have 20 coins, you put 10 in your personal account and 10 in the group account, and all others do the same, what is your payoff from this round?',
                         //
                     },
@@ -88,8 +87,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                         choices: ['0', '10', '25', 'Other/not clear from instructions'],
                         correctChoice: 2,
                         shuffleChoices: true,
-                        //                    requiredChoice: true,
-                        //                    title: false,
                     },
                 ]
             }
