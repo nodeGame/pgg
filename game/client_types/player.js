@@ -12,7 +12,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
 
     stager.setOnInit(function() {
-        var header, frame;
+        var header;
 
         console.log('INIT PLAYER!');
 
@@ -22,7 +22,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
         // Setup page: header + frame.
         header = W.generateHeader();
-        frame = W.generateFrame();
+        W.generateFrame();
 
         // Add widgets.
         this.visualRound = node.widgets.append('VisualRound', header);
