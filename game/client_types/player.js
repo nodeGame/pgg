@@ -94,9 +94,14 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('effort', {
+        donebutton: false,        
         frame: 'EffortTask.html',
         done: function() {
             return { effort: node.game.correct };
+        },
+        exit: function() {
+            node.game.zero.destroy();
+            node.game.zero = null;
         },
         cb: function() {
             var box = W.gid('box');
