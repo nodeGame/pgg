@@ -94,7 +94,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('effort', {
-        donebutton: false,        
+        donebutton: false,
         frame: 'EffortTask.html',
         done: function() {
             return { effort: node.game.correct };
@@ -117,9 +117,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
             //show effort task
             // Number of numbers for each line
-            var n = 10;
+            var n = 5;
             // Number of lines
-            var m = 5;
+            var m = 4;
             // Initialize count of zeros
             var zeros = 0;
             function genrand(n,m) {
@@ -164,22 +164,28 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             button = W.gid('submitAnswer');
             button.onclick = function() {
                 var count = node.game.zero.getValues().value;
-                var message;
+                var message1;
+                var message2;
                 if (count === zeros) {
-                    message = 'Correct';
+                    message1 = 'The answer is correct.';
                     node.game.correct += 1;
+                    message2='So far, you had '+ node.game.correct+ ' correct tables';
                 }
                 else {
-                    message = 'Wrong';
+                    message1 = 'The answer is wrong.';
+                    message2='So far, you had '+ node.game.correct+ ' correct tables';
                 }
-                // alert(message);
+//                alert(message);
                 // Hide element with id above.
                 // Show element with id results.
                 // Set innerHTML property of element with id textresult to
                 // the value correct or wrong and how many table done so far.
 
                 // hint: W.show and W.hide
-
+                W.hide('above');
+                W.show('results');
+                W.setInnerHTML('CheckAnswer', message1);
+                W.setInnerHTML('TotalPoint', message2);
                 genrand(n,m);
             };
 
@@ -188,6 +194,8 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             button2.onclick = function() {
                 // Hide element with id results.
                 // Show element with id above.
+            W.hide('results');
+            W.show('above');
             };
         },
 
