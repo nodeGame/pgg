@@ -99,7 +99,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             return { effort: node.game.correct };
         },
         cb: function() {
-            var above = W.gid('above');
+            var box = W.gid('box');
             // variable to count correct answer
             var correct = 0;
             node.game.correct = correct;
@@ -118,7 +118,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             // Initialize count of zeros
             var zeros = 0;
             function genrand(n,m) {
-                above.innerHTML = '';
+                box.innerHTML = '';
                 zeros = 0;
                 // Build a multidimensional array
                 for (var i = 0; i < m; i++) {
@@ -127,9 +127,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                     // Add div
                     var myDiv = document.createElement("div");
                     // Add the sequence to div
-                    myDiv.innerHTML = rand;
+                    myDiv.innerHTML = rand.join(' ');
                     // Display sequence
-                    above.appendChild(myDiv);
+                    box.appendChild(myDiv);
                     // number of zeros
                     for (var j = 0; j < n; j++) {
                         if (rand[j] === 0) {
@@ -138,23 +138,25 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                     }
                 }
 
-                node.game.zero = node.widgets.append('CustomInput', 'above', {
-                    id: 'zero',
-                    mainText: 'How many zeros are there?',
-                    type: 'int',
-                    min: 0,
-                    max: 50,
-                    requiredChoice: true
-                });
-
+                if (!node.game.zero) {
+                    node.game.zero = node.widgets.append('CustomInput', 'above', {
+                        id: 'zero',
+                        mainText: 'How many zeros are there?',
+                        type: 'int',
+                        min: 0,
+                        max: 50,
+                        requiredChoice: true
+                    });
+                }
+                else {
+                    node.game.zero.reset();
+                }
             }
 
             genrand(n,m);
 
             var button;
             button = W.gid('submitAnswer');
-
-
             button.onclick = function() {
                 var count = node.game.zero.getValues().value;
                 var message;
@@ -165,8 +167,22 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 else {
                     message = 'Wrong';
                 }
-                alert(message);
+                // alert(message);
+                // Hide element with id above.
+                // Show element with id results.
+                // Set innerHTML property of element with id textresult to
+                // the value correct or wrong and how many table done so far.
+
+                // hint: W.show and W.hide
+
                 genrand(n,m);
+            };
+
+            var button2;
+            button2 = W.gid('nextTable');
+            button2.onclick = function() {
+                // Hide element with id results.
+                // Show element with id above.
             };
         },
 

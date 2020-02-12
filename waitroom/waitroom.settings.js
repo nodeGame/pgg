@@ -45,7 +45,7 @@ module.exports = {
      *
      * Default: GROUP_SIZE
      */
-    POOL_SIZE: 4,
+    POOL_SIZE: 32,
 //Old information
 //    POOL_SIZE: 16,
     /**
@@ -220,7 +220,7 @@ module.exports = {
      */
     //DISCONNECT_IF_NOT_SELECTED: false,
 
-    
+
     ALLOW_PLAY_WITH_BOTS: true,
 
     ALLOW_SELECT_TREATMENT: true
