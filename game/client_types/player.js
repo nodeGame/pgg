@@ -10,7 +10,6 @@
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
-
     stager.setOnInit(function() {
         var header;
 
