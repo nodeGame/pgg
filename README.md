@@ -1,6 +1,6 @@
-## Mobility Game for nodeGame
+## Public-Good Game
 
-Public good game with high and low economic mobility for nodeGame.
+Public good game for nodeGame.
 
 ## Rules
 
@@ -14,7 +14,7 @@ For further information see [https://nodegame.org](https://nodegame.org).
 
 ## Version
 
-nodeGame >= 4.0
+nodeGame >= 6.0
 
 ## License
 
