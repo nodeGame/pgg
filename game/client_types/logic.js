@@ -154,6 +154,12 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             client = channel.registry.getClient(pid);
             client.win += payoff;
 
+            console.log({
+                distribution: distribution,
+                total: total,
+                payoff: payoff
+            })
+
             node.say('results', pid, {
                 distribution: distribution,
                 total: total,

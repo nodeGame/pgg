@@ -27,11 +27,67 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         this.visualTimer = node.widgets.append('VisualTimer', header);
         this.doneButton = node.widgets.append('DoneButton', header);
 
+
+        // This function is called to create the bars.
+        this.showBars = function(barsValues) {
+            var group, player, i, j, div, subdiv, color;
+            var barsDiv;
+            var text, groupHeader, groupHeaderText, groupNames;
+            var bars;
+
+            // Notice: _barsValues_ array:
+            // 0: array: contr, demand
+            // 1: array: group, position in group
+            // 2: payoff
+
+            console.log(barsValues);
+
+            barsDiv = W.getElementById('barsResults');
+
+            barsDiv.innerHTML = '';
+
+            bars = W.getFrameWindow().bars;
+
+            for (i = 0; i < barsValues[0].length; i++) {
+                group = barsValues[0][i];
+                div = document.createElement('div');
+                div.classList.add('groupContainer');
+                groupHeader = document.createElement('h4');
+                groupHeaderText = 'Group ' + groupNames[i];
+
+                groupHeader.innerHTML = groupHeaderText;
+                barsDiv.appendChild(div);
+                div.appendChild(groupHeader);
+
+                for (j = 0; j < group.length; j++) {
+
+                    player = group[j];
+
+                    // It is me?
+                    if (barsValues[1][0] === i && barsValues[1][1] === j) {
+                        color = [undefined, '#9932CC'];
+                        text = ' YOU <img src="imgs/arrow.jpg" ' +
+                            'style="height:15px;"/>';
+                    }
+                    else {
+                        color = ['#DEB887', '#A52A2A'];
+                        text = '';
+                    }
+
+                    // This is the DIV actually containing the bar
+                    subdiv = document.createElement('div');
+                    div.appendChild(subdiv);
+                    bars.createBar(subdiv, player[0], 20, color[0], text);
+
+                }
+            }
+        };
+
         this.displaySummaryPrevRound = function() {
             var save, groupReturn;
             // Shows previous round if round number is not 1.
             if ('number' !== typeof node.game.oldContrib) return;
-            save = node.game.income - node.game.oldContrib;
+            save = node.game.contrib - node.game.oldContrib;
             groupReturn = node.game.oldPayoff - save;
 
             W.show('previous-round-info');
@@ -96,7 +152,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         frame: settings.bidderPage,
         cb: function() {
 
-            W.setInnerHTML('bid_income', node.game.settings.COINS);
+            W.setInnerHTML('bid_contrib', node.game.settings.COINS);
 
             // Show summary previous round.
             node.game.displaySummaryPrevRound();
@@ -135,6 +191,10 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         cb: function () {
             node.on.data('results', function(msg) {
                 var payoff = msg.data.payoff;
+
+
+
+
 
                 node.game.oldPayoff = payoff;
 
