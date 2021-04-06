@@ -24,21 +24,15 @@ module.exports = {
     // Minimum number of players that must be always connected.
     MIN_PLAYERS: 4,
 
-
     // Payment settings. *
     //MPCR
     GROUP_ACCOUNT_MULTIPLIER: 2,
 
-    //high income
-    HIGH:40,
-    //low income
-    LOW: 20,
-
-    //how many high income
-    N_HIGH: 1,
-
     // Divider ECU / DOLLARS *
     EXCHANGE_RATE: 0.01,
+
+    // Number of coins each round.
+    COINS: 20,
 
 // setup time for each stage
     TIMER: {
@@ -67,27 +61,11 @@ module.exports = {
     resultsPage: 'results.html',
 
     treatments: {
-        Treatment_1: {
-            description: 'Merit-based and High mobility',
+        pgg: {
+            description: 'Public Good Game',
             instrPage: 'instructions_high_merit_based.html',
             quizPage: 'quiz_exo_perfect.html'
-        },
-        Treatment_3: {
-            description: 'Non-merit-based + High mobility',
-            instrPage: 'instructions_exo_perfect.html',
-            quizPage: 'quiz_exo_perfect.html'
-        },
-//        Treatment_2: {
-//            description: 'Merit-based and Low mobility',
-//            instrPage: 'instructions_low_merit-based.html',
-//            quizPage: 'quiz_exo_perfect.html'
-//        }
-//        Treatment_4: {
-//            description: 'Non merit-based and Low mobility',
-//            instrPage: 'instructions_low_non_merit-based.html',
-//            quizPage: 'quiz_exo_perfect.html'
-//        }
-
+        }
 
     }
 

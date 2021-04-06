@@ -14,8 +14,8 @@ module.exports = function(stager, settings) {
     stager
         .next('instructions')
         .next('quiz')
+
         .repeat('game', settings.REPEAT)
-        .step('effort')
         .step('bid')
         .step('results')
 
@@ -25,16 +25,12 @@ module.exports = function(stager, settings) {
 
         .gameover();
 
-
-// we can add some comments here
-
     // Modify the stager to skip some stages.
 
- stager.skip('instructions');
- stager.skip('quiz');
- //   stager.skip('effort');
+    stager.skip('instructions');
+    stager.skip('quiz');
+
     // stager.skip('game');
     // stager.skip('questionnaire');
 
-    return stager.getState();
 };

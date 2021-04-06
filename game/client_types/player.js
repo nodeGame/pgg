@@ -17,7 +17,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
         node.game.oldContrib = null;
         node.game.oldPayoff = null;
-        node.game.income= null;
 
         // Setup page: header + frame.
         header = W.generateHeader();
@@ -93,137 +92,27 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
     });
 
-    stager.extendStep('effort', {
-        donebutton: false,
-        frame: 'EffortTask.html',
-        done: function() {
-            return { effort: node.game.correct };
-        },
-        exit: function() {
-            node.game.zero.destroy();
-            node.game.zero = null;
-        },
-        cb: function() {
-            var box = W.gid('box');
-            // variable to count correct answer
-            var correct = 0;
-            node.game.correct = correct;
-            //this is how to skip 1 stage in the game
-            if (node.game.settings.treatmentName === 'Treatment_3') {
-                //skip effort task
-                node.done();
-                return;
-            }
-
-            //show effort task
-            // Number of numbers for each line
-            var n = 5;
-            // Number of lines
-            var m = 4;
-            // Initialize count of zeros
-            var zeros = 0;
-            function genrand(n,m) {
-                box.innerHTML = '';
-                zeros = 0;
-                // Build a multidimensional array
-                for (var i = 0; i < m; i++) {
-                    // Generate random sequence
-                    var rand = Array(n).fill().map(() => Math.floor(Math.random()*2));
-                    // Add div
-                    var myDiv = document.createElement("div");
-                    // Add the sequence to div
-                    myDiv.innerHTML = rand.join(' ');
-                    // Display sequence
-                    box.appendChild(myDiv);
-                    // number of zeros
-                    for (var j = 0; j < n; j++) {
-                        if (rand[j] === 0) {
-                            zeros += 1;
-                        }
-                    }
-                }
-
-                if (!node.game.zero) {
-                    node.game.zero = node.widgets.append('CustomInput', 'above', {
-                        id: 'zero',
-                        mainText: 'How many zeros are there?',
-                        type: 'int',
-                        min: 0,
-                        max: 50,
-                        requiredChoice: true
-                    });
-                }
-                else {
-                    node.game.zero.reset();
-                }
-            }
-
-            genrand(n,m);
-
-            var button;
-            button = W.gid('submitAnswer');
-            button.onclick = function() {
-                var count = node.game.zero.getValues().value;
-                var message1;
-                var message2;
-                if (count === zeros) {
-                    message1 = 'The answer is correct.';
-                    node.game.correct += 1;
-                    message2='So far, you had '+ node.game.correct+ ' correct tables';
-                }
-                else {
-                    message1 = 'The answer is wrong.';
-                    message2='So far, you had '+ node.game.correct+ ' correct tables';
-                }
-//                alert(message);
-                // Hide element with id above.
-                // Show element with id results.
-                // Set innerHTML property of element with id textresult to
-                // the value correct or wrong and how many table done so far.
-
-                // hint: W.show and W.hide
-                W.hide('above');
-                W.show('results');
-                W.setInnerHTML('CheckAnswer', message1);
-                W.setInnerHTML('TotalPoint', message2);
-                genrand(n,m);
-            };
-
-            var button2;
-            button2 = W.gid('nextTable');
-            button2.onclick = function() {
-                // Hide element with id results.
-                // Show element with id above.
-            W.hide('results');
-            W.show('above');
-            };
-        },
-
-    });
-
     stager.extendStep('bid', {
         frame: settings.bidderPage,
         cb: function() {
 
+            W.setInnerHTML('bid_income', node.game.settings.COINS);
+
             // Show summary previous round.
             node.game.displaySummaryPrevRound();
-
             node.game.bidInput = node.widgets.append('CustomInput', "input-td", {
                 type: 'int',
                 min: 0,
-                max: 20,
+                max: node.game.settings.COINS,
                 requiredChoice: true
             });
 
-            node.on.data('income', function(msg) {
-                W.setInnerHTML('bid_income', msg.data);
-                node.game.income = msg.data;
-            });
+
         },
         timeup: function() {
             var contribution = node.game.oldContrib;
             if ('undefined' === typeof contribution) {
-                contribution = J.randomInt(-1, 20);
+                contribution = J.randomInt(-1, node.game.settings.COINS);
             }
             node.game.bidInput.setValues({
                 // Random value if undefined.
@@ -250,7 +139,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 node.game.oldPayoff = payoff;
 
                 // How many coins player put in personal account.
-                var save = node.game.income - node.game.oldContrib;
+                var save = node.game.settings.COINS - node.game.oldContrib;
                 var payoffSpan = W.gid('payoff');
                 payoffSpan.innerHTML = save + ' + ' + (payoff - save) +
                 ' = ' + node.game.oldPayoff;
@@ -306,14 +195,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
                     {
                         name: 'ChoiceTable',
-                        id: 'mobility',
-                        choices: [ 'Low', 'High', 'No opinion'],
-                        requiredChoice: true,
-                        title: false,
-                        mainText: 'Based on incomes you obtained throughout 4 rounds, how do you perceive income mobility of your group?'
-                    },
-                    {
-                        name: 'ChoiceTable',
                         id: 'strategy',
                         choices: [
                             [ 'random', 'Randomly chose numbers' ],
@@ -338,7 +219,6 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             name: 'EndScreen',
             root: 'container',
             options: {
-                className: 'centered',
                 title: false,
                 feedback: false,
                 exitCode: false,

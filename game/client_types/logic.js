@@ -7,78 +7,91 @@
 * ---
 */
 
-var path = require('path');
-var fs   = require('fs-extra');
+const path = require('path');
+const fs   = require('fs-extra');
 
-var ngc = require('nodegame-client');
-var J = ngc.JSUS;
+const ngc = require('nodegame-client');
+const J = ngc.JSUS;
 
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
-    var channel = gameRoom.channel;
-    var node = gameRoom.node;
-    var groupSize = gameRoom.game.waitroom.GROUP_SIZE;
+    const channel = gameRoom.channel;
+    const node = gameRoom.node;
+    const groupSize = gameRoom.game.waitroom.GROUP_SIZE;
+    const memory = node.game.memory;
 
     stager.setDefaultProperty('minPlayers', [ groupSize ]);
 
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
-        console.log('********************** socmob ' + gameRoom.name);
 
-        // Keep tracks of results sent to players in case of disconnections.
-        node.game.incomes = {};
 
-        // Add session name to data in DB.
-        node.game.memory.on('insert', function(o) {
-            o.session = node.nodename;
-        });
+
     });
 
     // Extends Stages and Steps where needed.
 
-    stager.extendStep('effort', {
-        init: function() {
-            var efforts = [];
-            node.game.efforts = efforts;
-        },
-        cb: function() {
-            node.on.data('done', function(msg) {
-                node.game.efforts.push({
-                    id: msg.from,
-                    effort: msg.data.effort
-                });
-            });
-        }
-    });
-
-    //THIS IS BID IN MERIT-BASED TREATMENT (Treatment 1)
     stager.extendStep('bid', {
         init: function() {
             // Counter for total contributions in this round.
             this.totalContr = 0;
+            // Keep tracks of results sent to players in case of disconnections.
+            this.contribs = {};
         },
         cb: function() {
-            // Sort them
-            var sorted = node.game.efforts.sort(function(a, b) {
-                return b.effort - a.effort;
-            });
-            // to get from game.settings
-            var m = node.game.settings.N_HIGH;
-            var H = node.game.settings.HIGH;
-            var L = node.game.settings.LOW;
 
-            var pid, income;
-            for (var i = 0; i < sorted.length; i++) {
-                if (i < m) income = H;
-                else income = L;
-                pid = sorted[i].id;
-                node.say('income', pid, income);
-                this.incomes[pid] = income;
-            }
+            // Sort them
+            // var sorted = node.game.efforts.sort(sortContributions);
+            //
+            //
+            // var currentStage = node.game.getCurrentGameStage();
+            // var previousStage = node.game.plot.previous(currentStage);
+            //
+            // var receivedData = memory.stage[previousStage]
+            //                    .selexec('contribution');
+            //
+            // // If a player submitted twice with reconnections.
+            //
+            // var i, len, o = {}, c, newSize = 0;
+            // i = -1, len = receivedData.db.length;
+            // for ( ; ++i < len ; ) {
+            //     c = receivedData.db[i];
+            //     if (!o[c.player]) {
+            //         ++newSize;
+            //     }
+            //     o[c.player] = c;
+            // }
+            // if (newSize !== receivedData.length) {
+            //     var newDb = [];
+            //     for ( i in o ) {
+            //         if (o.hasOwnProperty(i)) {
+            //             newDb.push(o[i]);
+            //         }
+            //     }
+            //     receivedData = new ngc.GameDB();
+            //     receivedData.importDB(newDb);
+            // }
+            //
+            // // If a player submitted twice with reconnections.
+            //
+            // sorted = receivedData
+            //     .sort(sortContributions)
+            //     .fetch();
+            //
+            //
+            // var pid, income;
+            // for (var i = 0; i < sorted.length; i++) {
+            //
+            //     pid = sorted[i].id;
+            //     node.say('income', pid, income);
+            //     this.contribs[pid] = income;
+            // }
 
             // Keep count of total contributions as they arrive.
             node.on.data('done', function(msg) {
+                console.log(msg);
+                this.contribs[msg.from] = msg.data.contribution;
                 this.totalContr += msg.data.contribution;
             });
         }
@@ -91,17 +104,16 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             // Get previous contributions
             previousStep = node.game.getPreviousStep();
             // Get all contribution in previous step.
-            sortedContribs = node.game.memory.stage[previousStep]
+            sortedContribs = memory.stage[previousStep]
             .selexec('contribution')
-            // Sorting not needed now.
-            // .sort(sortContributions)
+            .sort(sortContributions)
             .fetch();
 
             // Multiply contributions.
             total = this.totalContr * settings.GROUP_ACCOUNT_MULTIPLIER;
 
             // Save to db, and sends results to players.
-            finalizeRound(total, this.incomes, sortedContribs);
+            finalizeRound(total, this.contribs, sortedContribs);
         }
     });
 
@@ -112,22 +124,20 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             console.log('***********************');
 
             gameRoom.computeBonus({
-                say: true,   // default false
-                dump: true,  // default false
-                print: true  // default false
+                say: true,
+                dump: true,
+                print: true
             });
 
-            // TODO: save email
-
             // Dump all memory.
-            node.game.memory.save('memory_all.json');
+            memory.save('memory_all.json');
         }
     });
 
     // Helper functions.
 
     // Saves results and sends to clients.
-    function finalizeRound(total, incomes, sortedContribs) {
+    function finalizeRound(total, contribs, sortedContribs) {
         var i, contribObj;
         var pid, payoff, client, distribution;
 
@@ -137,7 +147,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             contribObj = sortedContribs[i];
             pid = contribObj.player;
 
-            payoff = distribution + incomes[pid] - contribObj.contribution;
+            payoff = distribution + contribs[pid] - contribObj.contribution;
 
             // Store payoff in registry, so that gameRoom.computeBonus
             // can access it.

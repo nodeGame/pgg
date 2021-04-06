@@ -34,8 +34,7 @@ module.exports = {
      * The size of each group dispatched by the waiting room
      */
     GROUP_SIZE: 4,
-//old information
- //   GROUP_SIZE: 16,
+
     /**
      * ## POOL_SIZE (number) Optional
      *
@@ -45,9 +44,8 @@ module.exports = {
      *
      * Default: GROUP_SIZE
      */
-    POOL_SIZE: 32,
-//Old information
-//    POOL_SIZE: 16,
+    POOL_SIZE: 4,
+
     /**
      * ## N_GAMES (number) Optional
      *
@@ -101,7 +99,7 @@ module.exports = {
     //CHOSEN_TREATMENT: function(treatments, roomCounter) {
     //    return treatments[roomCounter % treatments.length];
     //},
-    CHOSEN_TREATMENT: 'Treatment_1',
+    // CHOSEN_TREATMENT: 'Treatment_1',
 
     /**
      * ## PLAYER_SORTING

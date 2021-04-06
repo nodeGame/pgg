@@ -8,13 +8,13 @@
  * http://www.nodegame.org
  */
 
-var ngc = require('nodegame-client');
-var J = ngc.JSUS;
+const ngc = require('nodegame-client');
+const J = ngc.JSUS;
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
-    var channel = gameRoom.channel;
-    var logic = gameRoom.node;
+    const channel = gameRoom.channel;
+    const logic = gameRoom.node;
 
     stager.extendAllSteps(function(o) {
         o.cb = function() {
@@ -26,24 +26,15 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             // We do not actually play.
             if (id === 'bid') {
                 node.on('PLAYING', function() {
-                    node.timer.randomExec(function() {
+                    node.timer.random.exec(function() {
                         node.done({
                             contribution: J.randomInt(-1, 20)
                         });
                     });
                 });
             }
-            else if (id === 'effort') {
-				node.on('PLAYING', function() {
-                    node.timer.randomExec(function() {
-                        node.done({
-                            effort: J.randomInt(-1, 1)
-                        });
-                    });
-                });
-			}
             else {
-                node.timer.randomDone(2000);
+                node.timer.random.done();
             }
         };
         return o;

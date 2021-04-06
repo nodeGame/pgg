@@ -28,10 +28,10 @@ module.exports = {
     // alias: [ 'experiment' ],
 
     // Name of the endpoint for socket.io player connections
-    playerServer: 'socmob',
+    // playerServer: 'pgg',
 
     // Name of the endpoint for the socket.io admin connections
-    adminServer: 'socmob/admin',
+    // adminServer: 'pgg/admin',
 
     // All options below are shared by player and admin servers.
 

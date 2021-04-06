@@ -8,14 +8,14 @@
  * http://www.nodegame.org
  */
 
- var ngc = require('nodegame-client');
+ const ngc = require('nodegame-client');
 
 module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
-    var channel = gameRoom.channel;
-    var node = gameRoom.node;
+    const channel = gameRoom.channel;
+    const node = gameRoom.node;
 
-    var game, stager;
+    var game;
 
     game = gameRoom.getClientType('player');
     game.nodename = 'autoplay';
@@ -38,17 +38,17 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             if (id === 'quiz' || id === 'questionnaire') {
                 node.widgets.lastAppended.setValues();
             }
-            else if (id === 'bid') {                
+            else if (id === 'bid') {
                 node.on('PLAYING', function() {
-                    node.timer.randomExec(function() {
+                    node.timer.random.exec(function() {
                         node.game.timer.doTimeUp();
                     });
                 });
             }
-                
+
             if (id !== 'end') {
-                node.timer.randomDone(2000);
-            }            
+                node.timer.random.done();
+            }
         };
         return o;
     });
