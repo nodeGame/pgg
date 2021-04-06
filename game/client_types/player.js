@@ -103,18 +103,15 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     // STAGES and STEPS.
 
     stager.extendStep('instructions', {
-        frame: settings.instrPage
+        frame: 'instructions.htm'
     });
 
     stager.extendStep('quiz', {
-        frame: 'quiz_exo_perfect.html',
         widget: {
             name: 'ChoiceManager',
-            root: 'root',
             options: {
                 id: 'quiz',
                 title: false,
-                className: 'centered',
                 forms: [
                     {
                         name: 'ChoiceTable',
@@ -149,7 +146,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('bid', {
-        frame: settings.bidderPage,
+        frame: 'bidder.htm',
         cb: function() {
 
             W.setInnerHTML('bid_contrib', node.game.settings.COINS);
@@ -187,22 +184,19 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('results', {
-        frame: settings.resultsPage,
+        frame: 'results.htm',
         cb: function () {
             node.on.data('results', function(msg) {
                 var payoff = msg.data.payoff;
-
-
-
-
-
                 node.game.oldPayoff = payoff;
 
                 // How many coins player put in personal account.
                 var save = node.game.settings.COINS - node.game.oldContrib;
                 var payoffSpan = W.gid('payoff');
-                payoffSpan.innerHTML = save + ' + ' + (payoff - save) +
-                ' = ' + node.game.oldPayoff;
+                    payoffSpan.innerHTML = save + ' + ' + (payoff - save) +
+                    ' = ' + node.game.oldPayoff;
+
+                if (node.game.settings.showBars) this.showBars(msg.data);
             });
         }
     });
@@ -274,10 +268,12 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     });
 
     stager.extendStep('end', {
-        donebutton: false,
+        init: function() {
+            node.game.doneButton.destroy();
+            node.game.visualTimer.destroy();
+        },
         widget: {
             name: 'EndScreen',
-            root: 'container',
             options: {
                 title: false,
                 feedback: false,

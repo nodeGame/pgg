@@ -55,18 +55,15 @@ module.exports = {
         questionnaire: 45000
     },
 
-    // Treatments definition.
-    // Custom pages depending on treatment.
-    bidderPage:  'bidder.html',
-    resultsPage: 'results.html',
-
     treatments: {
         pgg: {
             description: 'Public Good Game',
-            instrPage: 'instructions_high_merit_based.html',
-            quizPage: 'quiz_exo_perfect.html'
+            showBars: false
+        },
+
+        pgg_bars: {
+            description: 'Public good game with results shown with bars',
+            showBars: true
         }
-
     }
-
 };
