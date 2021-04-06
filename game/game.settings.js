@@ -58,7 +58,7 @@ module.exports = {
     treatments: {
         pgg: {
             description: 'Public Good Game',
-            showBars: false
+            showBars: true
         },
 
         pgg_bars: {

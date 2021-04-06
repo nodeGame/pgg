@@ -40,57 +40,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             this.contribs = {};
         },
         cb: function() {
-
-            // Sort them
-            // var sorted = node.game.efforts.sort(sortContributions);
-            //
-            //
-            // var currentStage = node.game.getCurrentGameStage();
-            // var previousStage = node.game.plot.previous(currentStage);
-            //
-            // var receivedData = memory.stage[previousStage]
-            //                    .selexec('contribution');
-            //
-            // // If a player submitted twice with reconnections.
-            //
-            // var i, len, o = {}, c, newSize = 0;
-            // i = -1, len = receivedData.db.length;
-            // for ( ; ++i < len ; ) {
-            //     c = receivedData.db[i];
-            //     if (!o[c.player]) {
-            //         ++newSize;
-            //     }
-            //     o[c.player] = c;
-            // }
-            // if (newSize !== receivedData.length) {
-            //     var newDb = [];
-            //     for ( i in o ) {
-            //         if (o.hasOwnProperty(i)) {
-            //             newDb.push(o[i]);
-            //         }
-            //     }
-            //     receivedData = new ngc.GameDB();
-            //     receivedData.importDB(newDb);
-            // }
-            //
-            // // If a player submitted twice with reconnections.
-            //
-            // sorted = receivedData
-            //     .sort(sortContributions)
-            //     .fetch();
-            //
-            //
-            // var pid, income;
-            // for (var i = 0; i < sorted.length; i++) {
-            //
-            //     pid = sorted[i].id;
-            //     node.say('income', pid, income);
-            //     this.contribs[pid] = income;
-            // }
-
             // Keep count of total contributions as they arrive.
             node.on.data('done', function(msg) {
-                console.log(msg);
+                // console.log(msg);
                 this.contribs[msg.from] = msg.data.contribution;
                 this.totalContr += msg.data.contribution;
             });
@@ -154,17 +106,19 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             client = channel.registry.getClient(pid);
             client.win += payoff;
 
-            console.log({
-                distribution: distribution,
-                total: total,
-                payoff: payoff
-            })
-
-            node.say('results', pid, {
-                distribution: distribution,
-                total: total,
-                payoff: payoff
-            });
+            if (settings.showBars) {
+                node.say('results', pid, {
+                    contribs: sortedContribs,
+                    total: total,
+                    payoff: payoff
+                });
+            }
+            else {
+                node.say('results', pid, {
+                    total: total,
+                    payoff: payoff
+                });
+            }
         }
     }
 

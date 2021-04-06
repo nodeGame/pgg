@@ -29,57 +29,48 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
 
         // This function is called to create the bars.
-        this.showBars = function(barsValues) {
-            var group, player, i, j, div, subdiv, color;
+        this.showBars = function(contribs) {
+            var player, i, div, subdiv, color;
             var barsDiv;
-            var text, groupHeader, groupHeaderText, groupNames;
+            var text
             var bars;
 
-            // Notice: _barsValues_ array:
-            // 0: array: contr, demand
-            // 1: array: group, position in group
-            // 2: payoff
-
-            console.log(barsValues);
+            console.log(contribs);
 
             barsDiv = W.getElementById('barsResults');
-
             barsDiv.innerHTML = '';
 
             bars = W.getFrameWindow().bars;
 
-            for (i = 0; i < barsValues[0].length; i++) {
-                group = barsValues[0][i];
+            for (i = 0; i < contribs.length; i++) {
                 div = document.createElement('div');
-                div.classList.add('groupContainer');
-                groupHeader = document.createElement('h4');
-                groupHeaderText = 'Group ' + groupNames[i];
+                // div.classList.add('groupContainer');
+                // groupHeader = document.createElement('h4');
+                // groupHeaderText = 'Group ' + groupNames[i];
 
-                groupHeader.innerHTML = groupHeaderText;
+                // groupHeader.innerHTML = groupHeaderText;
                 barsDiv.appendChild(div);
-                div.appendChild(groupHeader);
+                // div.appendChild(groupHeader);
 
-                for (j = 0; j < group.length; j++) {
+                player = contribs[i].player;
 
-                    player = group[j];
-
-                    // It is me?
-                    if (barsValues[1][0] === i && barsValues[1][1] === j) {
-                        color = [undefined, '#9932CC'];
-                        text = ' YOU <img src="imgs/arrow.jpg" ' +
-                            'style="height:15px;"/>';
-                    }
-                    else {
-                        color = ['#DEB887', '#A52A2A'];
-                        text = '';
-                    }
-
-                    // This is the DIV actually containing the bar
-                    subdiv = document.createElement('div');
-                    div.appendChild(subdiv);
-                    bars.createBar(subdiv, player[0], 20, color[0], text);
-
+                // It is me?
+                if (player === node.player.id) {
+                    color = '';
+                    text = ' YOU <img src="imgs/arrow.jpg" ' +
+                    'style="height:15px;"/>';
                 }
+                else {
+                    color = '#9932CC';
+                    text = '';
+                }
+
+                // This is the DIV actually containing the bar
+                subdiv = document.createElement('div');
+                div.appendChild(subdiv);
+                bars.createBar(subdiv, contribs[i].contribution,
+                    node.game.settings.COINS, color, text);
+
             }
         };
 
@@ -187,16 +178,20 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
         frame: 'results.htm',
         cb: function () {
             node.on.data('results', function(msg) {
-                var payoff = msg.data.payoff;
+                var payoff, s;
+                s = node.game.settings;
+
+                payoff = msg.data.payoff;
                 node.game.oldPayoff = payoff;
 
                 // How many coins player put in personal account.
-                var save = node.game.settings.COINS - node.game.oldContrib;
+                var save = s.COINS - node.game.oldContrib;
                 var payoffSpan = W.gid('payoff');
                     payoffSpan.innerHTML = save + ' + ' + (payoff - save) +
                     ' = ' + node.game.oldPayoff;
 
-                if (node.game.settings.showBars) this.showBars(msg.data);
+                // Show bars if required.
+                if (s.showBars) this.showBars(msg.data.contribs);
             });
         }
     });
