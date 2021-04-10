@@ -57,7 +57,7 @@ module.exports = {
 
     treatments: {
         pgg: {
-            description: 'Klasická verze Public Good Game',
+            description: 'Public Good Game',
             showBars: true
         }
     }
