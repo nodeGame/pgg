@@ -219,7 +219,7 @@ module.exports = {
     //DISCONNECT_IF_NOT_SELECTED: false,
 
 
-    ALLOW_PLAY_WITH_BOTS: true,
+    ALLOW_PLAY_WITH_BOTS: false,
 
-    ALLOW_SELECT_TREATMENT: true
+    ALLOW_SELECT_TREATMENT: false
 };

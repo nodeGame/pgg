@@ -267,18 +267,19 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             node.game.doneButton.destroy();
             node.game.visualTimer.destroy();
         },
-        widget: {
-            name: 'EndScreen',
-            options: {
-                title: false,
-                feedback: false,
-                exitCode: false,
-                email: {
-                    texts: {
-                        label: 'Enter your email (optional):'
-                    }
-                }
-            }
-        }
+        frame: 'end.htm'
+        //widget: {
+        //    name: 'EndScreen',
+        //    options: {
+        //        title: false,
+        //        feedback: false,
+        //        exitCode: false,
+        //        email: {
+        //            texts: {
+        //                label: 'Enter your email (optional):'
+        //            }
+        //        }
+        //    }
+        //}
     });
 };
