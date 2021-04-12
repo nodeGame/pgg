@@ -66,6 +66,11 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
             // Save to db, and sends results to players.
             finalizeRound(total, this.contribs, sortedContribs);
+            
+            //console.log('****************************** FranČesko to zkouší... ******************************');
+            //console.log(sortedContribs);
+            //console.log(this.contribs);
+            //console.log(total);
         }
     });
 
@@ -92,6 +97,9 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     function finalizeRound(total, contribs, sortedContribs) {
         var i, contribObj;
         var pid, payoff, client, distribution;
+        
+        //console.log(contribs);
+        //console.log(total);
 
         distribution = total / sortedContribs.length;
         // Save the results for each player, and notify him/her.
@@ -99,7 +107,13 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             contribObj = sortedContribs[i];
             pid = contribObj.player;
 
-            payoff = distribution + contribs[pid] - contribObj.contribution;
+            payoff = node.game.settings.COINS - contribs[pid] + distribution; // Edited FrK: - contribObj.contribution;
+            
+            console.log('Player ' + pid + ':');
+            console.log('Distrbution: ' + distribution);
+            console.log('Contribution: ' + contribs[pid]);
+            console.log('Savings: ' + (node.game.settings.COINS - contribs[pid]));
+            console.log('Overall pay-off: ' + payoff);
 
             // Store payoff in registry, so that gameRoom.computeBonus
             // can access it.

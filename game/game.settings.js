@@ -19,7 +19,7 @@ module.exports = {
 
     // Numnber of game rounds repetitions.
 
-    REPEAT: 2,
+    REPEAT: 10,
 
     // Minimum number of players that must be always connected.
     MIN_PLAYERS: 4,
@@ -57,12 +57,7 @@ module.exports = {
 
     treatments: {
         pgg: {
-            description: 'Public Good Game',
-            showBars: true
-        },
-
-        pgg_bars: {
-            description: 'Public good game with results shown with bars',
+            description: 'Public Good Game with results shown with bars',
             showBars: true
         }
     }

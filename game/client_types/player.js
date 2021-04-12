@@ -13,7 +13,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     stager.setOnInit(function() {
         var header;
 
-        console.log('INIT PLAYER!');
+        console.log('INIT PLAYER! *******************************************');
 
         node.game.oldContrib = null;
         node.game.oldPayoff = null;
@@ -57,8 +57,8 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 // It is me?
                 if (player === node.player.id) {
                     color = '';
-                    text = ' YOU <img src="imgs/arrow.jpg" ' +
-                    'style="height:15px;"/>';
+                    text = ' <img src="imgs/arrow.jpg" ' +
+                    'style="height:15px;"/> YOU';
                 }
                 else {
                     color = '#9932CC';
@@ -69,7 +69,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
                 subdiv = document.createElement('div');
                 div.appendChild(subdiv);
                 bars.createBar(subdiv, contribs[i].contribution,
-                    node.game.settings.COINS, color, text);
+                    (1.3 * node.game.settings.COINS), color, text);
 
             }
         };
@@ -78,7 +78,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             var save, groupReturn;
             // Shows previous round if round number is not 1.
             if ('number' !== typeof node.game.oldContrib) return;
-            save = node.game.contrib - node.game.oldContrib;
+            save = node.game.settings.COINS - node.game.oldContrib;
             groupReturn = node.game.oldPayoff - save;
 
             W.show('previous-round-info');
