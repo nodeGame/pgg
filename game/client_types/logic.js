@@ -23,19 +23,37 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
     stager.setDefaultProperty('minPlayers', [ groupSize ]);
 
+    ////////////////////////////////////////////////////////////////////////
+    // If TRUE, the logic will try to "push" to the next step all clients
+    // that seems unresponsive. This can help recover from minor errors.
+    // Clients that fail to respond to the push are eventually disconnected.
+    ////////////////////////////////////////////////////////////////////////
+    stager.setDefaultProperty('pushClients', true);
+
     // Event handler registered in the init function are always valid.
     stager.setOnInit(function() {
-
-
-
+        // Do something.
     });
 
     // Extends Stages and Steps where needed.
 
+    stager.extendStage('game', {
+        init: function() {
+            // Creates a view for all database items created in this stage.
+            // We will use it to save items after each round.
+            memory.view('pgg', function() {
+                return node.game.isStage('game');
+            });
+        }
+    });
+
+
     stager.extendStep('bid', {
         init: function() {
-            // Counter for total contributions in this round.
+            // Total contributions by players in this round.
             this.totalContr = 0;
+            // Total contributions after the multiplier is applied.
+            this.totalContrMult = 0;
             // Keep tracks of results sent to players in case of disconnections.
             this.contribs = {};
         },
@@ -63,14 +81,34 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
 
             // Multiply contributions.
             total = this.totalContr * settings.GROUP_ACCOUNT_MULTIPLIER;
+            this.totalContrMult = total;
 
             // Save to db, and sends results to players.
             finalizeRound(total, this.contribs, sortedContribs);
-            
-            //console.log('****************************** FranČesko to zkouší... ******************************');
+
+            //console.log('****************************** DEBUG ******************************');
             //console.log(sortedContribs);
             //console.log(this.contribs);
             //console.log(total);
+
+        },
+        // The `exit` callback is executed after a step is finished.
+        exit: function() {
+            memory.pgg.save('pgg.csv', {
+                // Specify header in advance.
+                header: [
+                    "session", "player", "stage.round",
+                    "contribution", "payoff"
+                ],
+                adapter: {
+                    payoff: function(row) {
+                        return channel.registry.getClient(row.player).lastPayoff;
+                    }
+                },
+                flatten: true,            // Merge items together.
+                flattenByGroup: 'player', // One row per player every round.
+                updatesOnly: true         // Adds updates to same file.
+            });
         }
     });
 
@@ -97,7 +135,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     function finalizeRound(total, contribs, sortedContribs) {
         var i, contribObj;
         var pid, payoff, client, distribution;
-        
+
         //console.log(contribs);
         //console.log(total);
 
@@ -108,7 +146,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             pid = contribObj.player;
 
             payoff = node.game.settings.COINS - contribs[pid] + distribution; // Edited FrK: - contribObj.contribution;
-            
+
             console.log('Player ' + pid + ':');
             console.log('Distrbution: ' + distribution);
             console.log('Contribution: ' + contribs[pid]);
@@ -119,6 +157,8 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             // can access it.
             client = channel.registry.getClient(pid);
             client.win += payoff;
+            // Store last payoff.
+            client.lastPayoff = payoff;
 
             if (settings.showBars) {
                 node.say('results', pid, {

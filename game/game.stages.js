@@ -12,16 +12,16 @@
 module.exports = function(stager, settings) {
 
     stager
-        .next('instructions')
-        .next('quiz')
+        .stage('instructions')
+        .stage('quiz')
 
-        .repeat('game', settings.REPEAT)
+        .repeatStage('game', settings.REPEAT)
         .step('bid')
         .step('results')
 
-        .next('questionnaire')
+        .stage('questionnaire')
 
-        .next('end')
+        .stage('end')
 
         .gameover();
 

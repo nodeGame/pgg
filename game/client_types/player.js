@@ -35,7 +35,7 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
             var text
             var bars;
 
-            console.log(contribs);
+            // console.log(contribs);
 
             barsDiv = W.getElementById('barsResults');
             barsDiv.innerHTML = '';
@@ -94,7 +94,10 @@ module.exports = function(treatmentName, settings, stager, setup, gameRoom) {
     // STAGES and STEPS.
 
     stager.extendStep('instructions', {
-        frame: 'instructions.htm'
+        frame: 'instructions.htm',
+        cb: function() {
+            W.setInnerHTML('n-coins', node.game.settings.COINS);
+        }
     });
 
     stager.extendStep('quiz', {
